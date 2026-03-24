@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0f172a" />
-  <title>모바일 간호사 스케줄러</title>
+  <title>모바일 간호사 스케줄러 v2</title>
   <style>
     :root{
       --bg:#f8fafc;
@@ -21,7 +21,6 @@
       --success:#10b981;
       --shadow:0 10px 30px rgba(15,23,42,.08);
       --radius:18px;
-      --stickyTop:0px;
     }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
     html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard","Segoe UI",Roboto,sans-serif;}
@@ -30,7 +29,7 @@
     .topbar{position:sticky;top:0;z-index:50;background:linear-gradient(to bottom, rgba(248,250,252,.96), rgba(248,250,252,.9));backdrop-filter:blur(8px);padding:8px 0 10px;}
     .title-card{background:linear-gradient(135deg,#0f172a,#1e293b);color:#fff;border-radius:22px;padding:16px;box-shadow:var(--shadow);}
     .title{font-size:20px;font-weight:800;letter-spacing:-.02em;margin:0 0 6px;}
-    .subtitle{font-size:12px;opacity:.85;line-height:1.45;margin:0;}
+    .subtitle{font-size:12px;opacity:.9;line-height:1.45;margin:0;}
     .quick-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
     .wide{grid-column:1/-1;}
     .btn{appearance:none;border:0;border-radius:14px;padding:12px 14px;font-weight:700;font-size:14px;line-height:1.2;display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;box-shadow:var(--shadow);transition:transform .12s ease, opacity .12s ease;background:#fff;color:var(--text);}
@@ -49,20 +48,17 @@
     .grid{display:grid;gap:10px;}
     .grid-2{grid-template-columns:1fr 1fr;}
     .grid-3{grid-template-columns:repeat(3,1fr);}
+    .grid-5{grid-template-columns:repeat(5,1fr);}
     .field{display:flex;flex-direction:column;gap:6px;}
     .label{font-size:12px;font-weight:700;color:#334155;}
     .hint{font-size:11px;color:var(--muted);line-height:1.45;}
     .input,.textarea,.select{width:100%;border:1px solid #cbd5e1;border-radius:14px;background:#fff;padding:12px 12px;font-size:14px;color:var(--text);outline:none;}
     .input:focus,.textarea:focus,.select:focus{border-color:#93c5fd;box-shadow:0 0 0 4px rgba(59,130,246,.12);}
     .textarea{min-height:92px;resize:vertical;line-height:1.5;}
-    .check-wrap{display:flex;align-items:center;gap:10px;padding:12px;border:1px solid var(--line);border-radius:14px;background:#f8fafc;}
-    .check{width:18px;height:18px;accent-color:var(--accent);}
+    .check-wrap{display:flex;align-items:flex-start;gap:10px;padding:12px;border:1px solid var(--line);border-radius:14px;background:#f8fafc;}
+    .check{width:18px;height:18px;accent-color:var(--accent);margin-top:2px;}
     .badge-row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
     .badge{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border-radius:999px;font-size:12px;font-weight:700;background:#eff6ff;color:#1d4ed8;}
-    .badge.d{background:rgba(16,185,129,.12);color:#047857;}
-    .badge.e{background:rgba(245,158,11,.12);color:#b45309;}
-    .badge.n{background:rgba(139,92,246,.12);color:#6d28d9;}
-    .badge.o{background:rgba(148,163,184,.18);color:#475569;}
     .status{margin-top:12px;padding:12px 14px;border-radius:16px;font-size:13px;font-weight:700;display:none;}
     .status.show{display:block;}
     .status.info{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;}
@@ -71,17 +67,17 @@
     .legend{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px 0;}
     .legend-item{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;color:#334155;}
     .dot{width:12px;height:12px;border-radius:999px;}
-    .dot.d{background:var(--d);}.dot.e{background:var(--e);}.dot.n{background:var(--n);}.dot.o{background:var(--o);}    
+    .dot.d{background:var(--d);} .dot.e{background:var(--e);} .dot.n{background:var(--n);} .dot.o{background:var(--o);} .dot.holiday{background:#ef4444;}
     .table-wrap{overflow:auto;-webkit-overflow-scrolling:touch;border-top:1px solid var(--line);}
     table{border-collapse:separate;border-spacing:0;min-width:max-content;width:100%;}
     th,td{border-right:1px solid #e2e8f0;border-bottom:1px solid #e2e8f0;padding:0;background:#fff;}
-    th{position:sticky;top:0;z-index:4;background:#f8fafc;font-size:12px;font-weight:800;color:#334155;text-align:center;height:52px;min-width:46px;}
+    th{position:sticky;top:0;z-index:4;background:#f8fafc;font-size:12px;font-weight:800;color:#334155;text-align:center;height:52px;min-width:48px;}
     th.sticky-left, td.sticky-left{position:sticky;left:0;z-index:5;background:#fff;}
-    th.sticky-left{z-index:7;background:#f8fafc;min-width:112px;max-width:112px;}
-    .name-cell{padding:10px 10px 9px;min-width:112px;max-width:112px;}
+    th.sticky-left{z-index:7;background:#f8fafc;min-width:120px;max-width:120px;}
+    .name-cell{padding:10px 10px 9px;min-width:120px;max-width:120px;}
     .name{font-size:13px;font-weight:800;color:#0f172a;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
     .subname{font-size:11px;color:var(--muted);margin-top:4px;}
-    .shift-cell{width:46px;height:48px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;user-select:none;cursor:pointer;position:relative;}
+    .shift-cell{width:48px;height:48px;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:16px;user-select:none;cursor:pointer;position:relative;}
     .shift-cell small{position:absolute;right:4px;bottom:3px;font-size:9px;font-weight:800;opacity:.75;}
     .shift-D{background:rgba(16,185,129,.12);color:#047857;}
     .shift-E{background:rgba(245,158,11,.12);color:#b45309;}
@@ -93,6 +89,7 @@
     .day-head .dow{font-size:10px;color:var(--muted);font-weight:700;}
     .sat .num,.sat .dow{color:#2563eb;}
     .sun .num,.sun .dow{color:#dc2626;}
+    .holiday .num,.holiday .dow{color:#dc2626;}
     .cards{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
     .stat-card{padding:14px;border-radius:16px;background:#fff;border:1px solid var(--line);box-shadow:var(--shadow);}
     .stat-title{font-size:12px;color:var(--muted);font-weight:700;}
@@ -101,23 +98,22 @@
     .small-table table{min-width:100%;}
     .small-table th,.small-table td{padding:10px 8px;font-size:12px;height:auto;text-align:center;}
     .small-table th{background:#f8fafc;position:sticky;top:0;z-index:2;}
-    .small-table td:first-child,.small-table th:first-child{position:sticky;left:0;background:#fff;z-index:3;text-align:left;min-width:96px;}
+    .small-table td:first-child,.small-table th:first-child{position:sticky;left:0;background:#fff;z-index:3;text-align:left;min-width:110px;}
     .small-table th:first-child{background:#f8fafc;z-index:4;}
     .footer-note{padding:14px;font-size:12px;color:var(--muted);line-height:1.6;}
     .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;}
-    .pill-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;}
-    .pill{padding:8px 10px;border:1px solid var(--line);border-radius:999px;background:#fff;font-size:12px;font-weight:700;color:#334155;}
+    .team-field.hidden{display:none;}
+    @media (max-width:420px){ .grid-3,.grid-5{grid-template-columns:1fr 1fr;} }
     @media print{
       @page{size:A4 landscape;margin:8mm;}
       body{background:#fff;}
       .topbar, details.section, .footer-note, #status, #mobileHint{display:none !important;}
       .app{padding:0;}
       .section{box-shadow:none;border:1px solid #cbd5e1;break-inside:avoid;border-radius:0;}
-      th{top:0;}
       .table-wrap,.small-table{overflow:visible;}
       .shift-cell{font-size:13px;height:34px;width:34px;}
-      .name-cell{min-width:84px;max-width:84px;padding:6px;}
-      th.sticky-left{min-width:84px;max-width:84px;}
+      .name-cell{min-width:88px;max-width:88px;padding:6px;}
+      th.sticky-left{min-width:88px;max-width:88px;}
       .legend{padding:8px 8px 0;}
     }
   </style>
@@ -126,8 +122,8 @@
   <div class="app">
     <div class="topbar">
       <div class="title-card">
-        <h1 class="title">모바일 간호사 스케줄러</h1>
-        <p class="subtitle">아이폰 사파리 기준으로 터치와 스크롤이 잘 되도록 다시 구성한 모바일 전용 버전입니다. 셀을 탭하면 요청 오프(O)가 고정되고, 설정 변경 시 자동 저장됩니다.</p>
+        <h1 class="title">모바일 간호사 스케줄러 v2</h1>
+        <p class="subtitle">팀별 인원수, 평일/주말·공휴일 필수인원, 공휴일 입력을 지원하는 확장 버전입니다. 셀을 탭하면 요청 오프(O)가 고정됩니다.</p>
         <div class="quick-actions">
           <button type="button" id="generateBtn" class="btn btn-primary wide">⚡ 스케줄 생성 / 다시 계산</button>
           <button type="button" id="csvBtn" class="btn">📥 CSV 다운로드</button>
@@ -140,10 +136,7 @@
     </div>
 
     <details class="section" open>
-      <summary>
-        <span>기본 설정</span>
-        <span class="summary-right">자동 저장</span>
-      </summary>
+      <summary><span>기본 설정</span><span class="summary-right">자동 저장</span></summary>
       <div class="section-body">
         <div class="grid grid-2">
           <div class="field">
@@ -155,10 +148,6 @@
             <input id="monthInput" class="input" type="number" min="1" max="12" />
           </div>
           <div class="field">
-            <label class="label" for="staffCountInput">전체 인원</label>
-            <input id="staffCountInput" class="input" type="number" min="1" max="60" />
-          </div>
-          <div class="field">
             <label class="label" for="teamCountInput">팀 구성</label>
             <select id="teamCountInput" class="select">
               <option value="2">2팀 (A, B)</option>
@@ -167,16 +156,37 @@
               <option value="5">5팀 (A, B, C, D, E)</option>
             </select>
           </div>
-        </div>
-        <div class="check-wrap" style="margin-top:10px;">
-          <input id="teamCNoNightInput" class="check" type="checkbox" />
-          <div>
-            <div class="label" style="margin:0 0 2px;">C팀은 나이트 근무 제외</div>
-            <div class="hint">팀 수가 3팀 이상일 때 적용돼요. 기본값은 체크 상태입니다.</div>
+          <div class="field">
+            <label class="label" for="totalStaffInput">전체 인원 (자동 계산)</label>
+            <input id="totalStaffInput" class="input" type="number" readonly />
           </div>
         </div>
+
+        <div class="section" style="margin-top:10px;box-shadow:none;">
+          <div class="section-head" style="padding-bottom:0;">팀별 인원수</div>
+          <div class="section-body" style="padding-top:10px;">
+            <div class="grid grid-5">
+              <div class="field team-field" data-team="A"><label class="label" for="teamAInput">A팀</label><input id="teamAInput" class="input" type="number" min="0" max="60" /></div>
+              <div class="field team-field" data-team="B"><label class="label" for="teamBInput">B팀</label><input id="teamBInput" class="input" type="number" min="0" max="60" /></div>
+              <div class="field team-field" data-team="C"><label class="label" for="teamCInput">C팀</label><input id="teamCInput" class="input" type="number" min="0" max="60" /></div>
+              <div class="field team-field" data-team="D"><label class="label" for="teamDInput">D팀</label><input id="teamDInput" class="input" type="number" min="0" max="60" /></div>
+              <div class="field team-field" data-team="E"><label class="label" for="teamEInput">E팀</label><input id="teamEInput" class="input" type="number" min="0" max="60" /></div>
+            </div>
+            <div class="hint" style="margin-top:8px;">선택한 팀 수만큼만 표시됩니다. 기본값은 A팀 5명, B팀 6명입니다.</div>
+          </div>
+        </div>
+
+        <div class="check-wrap" style="margin-top:10px;">
+          <input id="teamCoverageInput" class="check" type="checkbox" />
+          <div>
+            <div class="label" style="margin:0 0 2px;">팀별 최소 배치 규칙 적용</div>
+            <div class="hint">활성화 시 D/E/N 각각에서 모든 활성 팀이 최소 1명씩 배치됩니다. 필수 인원이 팀 수보다 적으면 생성되지 않습니다.</div>
+          </div>
+        </div>
+
         <div class="badge-row">
-          <span class="badge">기본 프리셋 포함</span>
+          <span class="badge">평일/주말·공휴일 분리</span>
+          <span class="badge">공휴일 직접 입력</span>
           <span class="badge">LocalStorage 유지</span>
           <span class="badge">3초 제한 탐색</span>
         </div>
@@ -184,48 +194,50 @@
     </details>
 
     <details class="section" open>
-      <summary>
-        <span>필수 인원</span>
-        <span class="summary-right">날짜별 최소 배치</span>
-      </summary>
+      <summary><span>필수 인원</span><span class="summary-right">평일 / 주말·공휴일</span></summary>
       <div class="section-body">
-        <div class="grid grid-3">
-          <div class="field">
-            <label class="label" for="requiredDInput">Day</label>
-            <input id="requiredDInput" class="input" type="number" min="0" max="30" />
-          </div>
-          <div class="field">
-            <label class="label" for="requiredEInput">Evening</label>
-            <input id="requiredEInput" class="input" type="number" min="0" max="30" />
-          </div>
-          <div class="field">
-            <label class="label" for="requiredNInput">Night</label>
-            <input id="requiredNInput" class="input" type="number" min="0" max="30" />
+        <div class="section" style="margin-top:10px;box-shadow:none;">
+          <div class="section-head" style="padding-bottom:0;">평일 필수 인원</div>
+          <div class="section-body" style="padding-top:10px;">
+            <div class="grid grid-3">
+              <div class="field"><label class="label" for="weekdayDInput">Day</label><input id="weekdayDInput" class="input" type="number" min="0" max="30" /></div>
+              <div class="field"><label class="label" for="weekdayEInput">Evening</label><input id="weekdayEInput" class="input" type="number" min="0" max="30" /></div>
+              <div class="field"><label class="label" for="weekdayNInput">Night</label><input id="weekdayNInput" class="input" type="number" min="0" max="30" /></div>
+            </div>
           </div>
         </div>
-        <div class="pill-row">
-          <span class="pill">D = 3명</span>
-          <span class="pill">E = 3명</span>
-          <span class="pill">N = 2명</span>
+
+        <div class="section" style="margin-top:10px;box-shadow:none;">
+          <div class="section-head" style="padding-bottom:0;">주말·공휴일 필수 인원</div>
+          <div class="section-body" style="padding-top:10px;">
+            <div class="grid grid-3">
+              <div class="field"><label class="label" for="holidayDInput">Day</label><input id="holidayDInput" class="input" type="number" min="0" max="30" /></div>
+              <div class="field"><label class="label" for="holidayEInput">Evening</label><input id="holidayEInput" class="input" type="number" min="0" max="30" /></div>
+              <div class="field"><label class="label" for="holidayNInput">Night</label><input id="holidayNInput" class="input" type="number" min="0" max="30" /></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="field" style="margin-top:10px;">
+          <label class="label" for="holidayDatesInput">공휴일 입력 (쉼표로 구분)</label>
+          <input id="holidayDatesInput" class="input" type="text" placeholder="예: 2026-05-05, 2026-05-25" />
+          <div class="hint">주말 외에 별도로 주말·공휴일 필수 인원 기준을 적용할 날짜를 입력합니다. 형식: <span class="mono">YYYY-MM-DD</span></div>
         </div>
       </div>
     </details>
 
     <details class="section" open>
-      <summary>
-        <span>Hard / Soft Rules</span>
-        <span class="summary-right">수정 가능</span>
-      </summary>
+      <summary><span>Hard / Soft Rules</span><span class="summary-right">수정 가능</span></summary>
       <div class="section-body">
         <div class="field">
           <label class="label" for="hardRulesInput">Hard Rules</label>
           <textarea id="hardRulesInput" class="textarea"></textarea>
-          <div class="hint">키워드 예시: <span class="mono">E-D</span>, <span class="mono">N-O-O</span>, <span class="mono">연속 근무 5일</span>, <span class="mono">연속 야간 3일</span>, <span class="mono">N-OF-D</span></div>
+          <div class="hint">키워드 예시: <span class="mono">주52시간</span>, <span class="mono">16시간</span>, <span class="mono">N-OFF-D</span>, <span class="mono">E-D</span>, <span class="mono">연속 근무 5일</span>, <span class="mono">월 8회</span>, <span class="mono">3연속</span>, <span class="mono">2 off</span></div>
         </div>
         <div class="field" style="margin-top:10px;">
           <label class="label" for="softRulesInput">Soft Rules</label>
           <textarea id="softRulesInput" class="textarea"></textarea>
-          <div class="hint">키워드 예시: <span class="mono">퐁당</span>, <span class="mono">D-O-D-O</span>, <span class="mono">주말 오프 균등</span></div>
+          <div class="hint">키워드 예시: <span class="mono">퐁당</span>, <span class="mono">주말 오프 균등</span>, <span class="mono">근무 편중 최소화</span></div>
         </div>
       </div>
     </details>
@@ -237,52 +249,39 @@
         <div class="legend-item"><span class="dot e"></span> Evening</div>
         <div class="legend-item"><span class="dot n"></span> Night</div>
         <div class="legend-item"><span class="dot o"></span> Off</div>
+        <div class="legend-item"><span class="dot holiday"></span> 공휴일 표시</div>
       </div>
-      <div class="footer-note" id="mobileHint">셀을 탭하면 요청 오프가 고정됩니다. 다시 탭하면 해제됩니다. 요청 오프는 작은 🔒 아이콘으로 표시돼요.</div>
+      <div class="footer-note" id="mobileHint">셀을 탭하면 요청 오프가 고정됩니다. 다시 탭하면 해제됩니다. 요청 오프는 작은 🔒 아이콘으로 표시됩니다.</div>
       <div class="table-wrap" id="scheduleWrap"></div>
     </div>
 
     <div class="cards" style="margin-top:12px;">
-      <div class="stat-card">
-        <div class="stat-title">총 인원</div>
-        <div class="stat-value" id="statStaff">0</div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-title">요청 오프 수</div>
-        <div class="stat-value" id="statRequestedOff">0</div>
-      </div>
+      <div class="stat-card"><div class="stat-title">총 인원</div><div class="stat-value" id="statStaff">0</div></div>
+      <div class="stat-card"><div class="stat-title">요청 오프 수</div><div class="stat-value" id="statRequestedOff">0</div></div>
     </div>
 
-    <div class="section">
-      <div class="section-head">개인별 통계</div>
-      <div class="small-table" id="personalStatsWrap"></div>
-    </div>
+    <div class="section"><div class="section-head">개인별 통계</div><div class="small-table" id="personalStatsWrap"></div></div>
+    <div class="section"><div class="section-head">날짜별 투입 현황</div><div class="small-table" id="dailyStatsWrap"></div></div>
 
-    <div class="section">
-      <div class="section-head">날짜별 투입 현황</div>
-      <div class="small-table" id="dailyStatsWrap"></div>
-    </div>
-
-    <div class="footer-note">CSV 버튼은 아이폰 사파리에서 파일 다운로드 대신 <strong>공유창</strong>으로 열릴 수 있습니다. 인쇄 버튼은 사파리의 공유 메뉴를 이용해 PDF로 저장할 수 있어요.</div>
+    <div class="footer-note">CSV 버튼은 아이폰 사파리에서 다운로드 대신 공유창으로 열릴 수 있습니다. 현재 규칙은 브라우저 내부에서 계산되며, 3초 내 해를 못 찾으면 경고 메시지를 표시합니다.</div>
   </div>
 
   <script>
   (function(){
     'use strict';
 
-    var STORAGE_KEY = 'nurse_scheduler_mobile_v1';
-    var now = new Date();
+    var STORAGE_KEY = 'nurse_scheduler_mobile_v2';
     var DEFAULTS = {
-      year: now.getFullYear(),
-      month: now.getMonth() + 1,
-      staffCount: 11,
-      teamCount: 3,
-      teamCNoNight: true,
-      requiredD: 3,
-      requiredE: 3,
-      requiredN: 2,
-      hardRules: '1. E-D 근무 금지 (16시간 휴게 보장)\n2. N-O-O (나이트 후 최소 2일 휴무) 필수\n3. 최대 연속 근무 5일 이하\n4. 연속 야간(N) 근무 최대 3일 이하\n5. N-OF-D 패턴 금지',
-      softRules: '1. 퐁당퐁당(D-O-D-O) 근무 최소화\n2. 주말 오프 균등 배분'
+      year: 2026,
+      month: 5,
+      teamCount: 2,
+      teamSizes: { A:5, B:6, C:0, D:0, E:0 },
+      applyTeamCoverage: true,
+      weekdayReq: { D:2, E:3, N:2 },
+      holidayReq: { D:2, E:2, N:2 },
+      holidays: '2026-05-05, 2026-05-25',
+      hardRules: '1. 1일 근무시간은 8시간으로 하며, 주당 총 근무시간은 52시간을 초과할 수 없다.\n2. 근무와 근무 사이에는 최소 16시간 이상의 휴게시간을 보장한다.\n3. N-OFF-D 및 E-D 패턴은 금지한다.\n4. 연속 근무는 최대 5일까지 허용한다.\n5. Night(N) 근무는 개인별 월 8회 이하이며, 최대 3연속까지만 허용한다.\n6. Night(N) 근무 후에는 최소 2일 Off를 반드시 보장한다.\n7. Off 수는 해당 월의 주말 및 공휴일 수 이상으로 보장한다.',
+      softRules: '1. 퐁당퐁당(D-O-D-O) 근무 최소화\n2. 주말 오프 균등 배분\n3. 개인별 D/E/N 편중 최소화'
     };
 
     var loadedState = safeLoadState();
@@ -291,6 +290,8 @@
       requestOff: loadedState.requestOff,
       schedule: null,
       staff: [],
+      holidaySet: new Set(),
+      activeTeams: [],
       lastMeta: null,
       autoTimer: null
     };
@@ -299,12 +300,21 @@
       status: document.getElementById('status'),
       yearInput: document.getElementById('yearInput'),
       monthInput: document.getElementById('monthInput'),
-      staffCountInput: document.getElementById('staffCountInput'),
       teamCountInput: document.getElementById('teamCountInput'),
-      teamCNoNightInput: document.getElementById('teamCNoNightInput'),
-      requiredDInput: document.getElementById('requiredDInput'),
-      requiredEInput: document.getElementById('requiredEInput'),
-      requiredNInput: document.getElementById('requiredNInput'),
+      totalStaffInput: document.getElementById('totalStaffInput'),
+      teamAInput: document.getElementById('teamAInput'),
+      teamBInput: document.getElementById('teamBInput'),
+      teamCInput: document.getElementById('teamCInput'),
+      teamDInput: document.getElementById('teamDInput'),
+      teamEInput: document.getElementById('teamEInput'),
+      teamCoverageInput: document.getElementById('teamCoverageInput'),
+      weekdayDInput: document.getElementById('weekdayDInput'),
+      weekdayEInput: document.getElementById('weekdayEInput'),
+      weekdayNInput: document.getElementById('weekdayNInput'),
+      holidayDInput: document.getElementById('holidayDInput'),
+      holidayEInput: document.getElementById('holidayEInput'),
+      holidayNInput: document.getElementById('holidayNInput'),
+      holidayDatesInput: document.getElementById('holidayDatesInput'),
       hardRulesInput: document.getElementById('hardRulesInput'),
       softRulesInput: document.getElementById('softRulesInput'),
       generateBtn: document.getElementById('generateBtn'),
@@ -329,243 +339,186 @@
         var raw = localStorage.getItem(STORAGE_KEY);
         if(!raw) return { settings: cloneDefaults(), requestOff: {} };
         var parsed = JSON.parse(raw);
-        return {
-          settings: Object.assign(cloneDefaults(), parsed.settings || {}),
-          requestOff: parsed.requestOff || {}
+        var defaults = cloneDefaults();
+        var merged = {
+          year: parsed.settings && parsed.settings.year != null ? parsed.settings.year : defaults.year,
+          month: parsed.settings && parsed.settings.month != null ? parsed.settings.month : defaults.month,
+          teamCount: parsed.settings && parsed.settings.teamCount != null ? parsed.settings.teamCount : defaults.teamCount,
+          teamSizes: Object.assign({}, defaults.teamSizes, parsed.settings && parsed.settings.teamSizes || {}),
+          applyTeamCoverage: parsed.settings && parsed.settings.applyTeamCoverage != null ? !!parsed.settings.applyTeamCoverage : defaults.applyTeamCoverage,
+          weekdayReq: Object.assign({}, defaults.weekdayReq, parsed.settings && parsed.settings.weekdayReq || {}),
+          holidayReq: Object.assign({}, defaults.holidayReq, parsed.settings && parsed.settings.holidayReq || {}),
+          holidays: parsed.settings && parsed.settings.holidays != null ? parsed.settings.holidays : defaults.holidays,
+          hardRules: parsed.settings && parsed.settings.hardRules != null ? parsed.settings.hardRules : defaults.hardRules,
+          softRules: parsed.settings && parsed.settings.softRules != null ? parsed.settings.softRules : defaults.softRules
         };
+        return { settings: merged, requestOff: parsed.requestOff || {} };
       }catch(e){
         return { settings: cloneDefaults(), requestOff: {} };
       }
     }
 
-    function cloneDefaults(){
-      return JSON.parse(JSON.stringify(DEFAULTS));
-    }
+    function cloneDefaults(){ return JSON.parse(JSON.stringify(DEFAULTS)); }
 
     function saveState(){
       try{
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          settings: state.settings,
-          requestOff: state.requestOff
-        }));
-      }catch(e){
-        // ignore storage errors on private mode or restricted environments
-      }
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({ settings: state.settings, requestOff: state.requestOff }));
+      }catch(e){}
     }
 
     function bindInputs(){
-      var inputMap = [
-        ['yearInput','year',intVal],
-        ['monthInput','month',intVal],
-        ['staffCountInput','staffCount',intVal],
-        ['teamCountInput','teamCount',intVal],
-        ['requiredDInput','requiredD',intVal],
-        ['requiredEInput','requiredE',intVal],
-        ['requiredNInput','requiredN',intVal],
-        ['hardRulesInput','hardRules',strVal],
-        ['softRulesInput','softRules',strVal]
-      ];
+      function bindNumber(el, callback){
+        el.addEventListener('input', function(){ callback(parseInt(el.value, 10)); saveState(); renderAll(); queueAutoGenerate(); }, {passive:true});
+      }
+      bindNumber(els.yearInput, function(v){ state.settings.year = isNaN(v) ? DEFAULTS.year : v; });
+      bindNumber(els.monthInput, function(v){ state.settings.month = isNaN(v) ? DEFAULTS.month : v; });
+      bindNumber(els.teamCountInput, function(v){ state.settings.teamCount = clamp(isNaN(v) ? DEFAULTS.teamCount : v, 2, 5); });
+      bindNumber(els.teamAInput, function(v){ state.settings.teamSizes.A = clamp(isNaN(v) ? 0 : v, 0, 60); });
+      bindNumber(els.teamBInput, function(v){ state.settings.teamSizes.B = clamp(isNaN(v) ? 0 : v, 0, 60); });
+      bindNumber(els.teamCInput, function(v){ state.settings.teamSizes.C = clamp(isNaN(v) ? 0 : v, 0, 60); });
+      bindNumber(els.teamDInput, function(v){ state.settings.teamSizes.D = clamp(isNaN(v) ? 0 : v, 0, 60); });
+      bindNumber(els.teamEInput, function(v){ state.settings.teamSizes.E = clamp(isNaN(v) ? 0 : v, 0, 60); });
+      bindNumber(els.weekdayDInput, function(v){ state.settings.weekdayReq.D = clamp(isNaN(v) ? 0 : v, 0, 30); });
+      bindNumber(els.weekdayEInput, function(v){ state.settings.weekdayReq.E = clamp(isNaN(v) ? 0 : v, 0, 30); });
+      bindNumber(els.weekdayNInput, function(v){ state.settings.weekdayReq.N = clamp(isNaN(v) ? 0 : v, 0, 30); });
+      bindNumber(els.holidayDInput, function(v){ state.settings.holidayReq.D = clamp(isNaN(v) ? 0 : v, 0, 30); });
+      bindNumber(els.holidayEInput, function(v){ state.settings.holidayReq.E = clamp(isNaN(v) ? 0 : v, 0, 30); });
+      bindNumber(els.holidayNInput, function(v){ state.settings.holidayReq.N = clamp(isNaN(v) ? 0 : v, 0, 30); });
 
-      inputMap.forEach(function(item){
-        var el = els[item[0]];
-        var key = item[1];
-        var caster = item[2];
-        el.addEventListener('input', function(){
-          state.settings[key] = caster(el.value, state.settings[key]);
-          if(key === 'teamCount' && state.settings.teamCount < 3){
-            state.settings.teamCNoNight = false;
-            els.teamCNoNightInput.checked = false;
-          }
-          saveState();
-          renderAll();
-          queueAutoGenerate();
-        }, {passive:true});
-      });
-
-      els.teamCNoNightInput.addEventListener('change', function(){
-        state.settings.teamCNoNight = !!els.teamCNoNightInput.checked;
-        saveState();
-        queueAutoGenerate();
-      });
-
-      els.generateBtn.addEventListener('click', function(){
-        generateAndRender(true);
-      });
-
-      els.csvBtn.addEventListener('click', function(){
-        downloadCsv();
-      });
-
-      els.printBtn.addEventListener('click', function(){
-        window.print();
-      });
-
-      els.clearOffBtn.addEventListener('click', function(){
-        state.requestOff = {};
-        saveState();
-        generateAndRender(true);
-      });
-
-      els.resetBtn.addEventListener('click', function(){
-        state.settings = cloneDefaults();
-        state.requestOff = {};
-        state.schedule = null;
-        state.lastMeta = null;
-        loadStateIntoForm();
-        saveState();
-        renderAll();
-        generateAndRender(true);
-      });
-    }
-
-    function intVal(v, fallback){
-      var n = parseInt(v, 10);
-      return isNaN(n) ? fallback : n;
-    }
-
-    function strVal(v){
-      return String(v == null ? '' : v);
+      els.teamCoverageInput.addEventListener('change', function(){ state.settings.applyTeamCoverage = !!els.teamCoverageInput.checked; saveState(); queueAutoGenerate(); });
+      els.holidayDatesInput.addEventListener('input', function(){ state.settings.holidays = String(els.holidayDatesInput.value || ''); saveState(); renderAll(); queueAutoGenerate(); }, {passive:true});
+      els.hardRulesInput.addEventListener('input', function(){ state.settings.hardRules = String(els.hardRulesInput.value || ''); saveState(); queueAutoGenerate(); }, {passive:true});
+      els.softRulesInput.addEventListener('input', function(){ state.settings.softRules = String(els.softRulesInput.value || ''); saveState(); queueAutoGenerate(); }, {passive:true});
+      els.generateBtn.addEventListener('click', function(){ generateAndRender(true); });
+      els.csvBtn.addEventListener('click', function(){ downloadCsv(); });
+      els.printBtn.addEventListener('click', function(){ window.print(); });
+      els.clearOffBtn.addEventListener('click', function(){ state.requestOff = {}; saveState(); generateAndRender(true); });
+      els.resetBtn.addEventListener('click', function(){ state.settings = cloneDefaults(); state.requestOff = {}; state.schedule = null; state.lastMeta = null; loadStateIntoForm(); saveState(); renderAll(); generateAndRender(true); });
     }
 
     function loadStateIntoForm(){
       els.yearInput.value = state.settings.year;
       els.monthInput.value = state.settings.month;
-      els.staffCountInput.value = state.settings.staffCount;
       els.teamCountInput.value = state.settings.teamCount;
-      els.teamCNoNightInput.checked = !!state.settings.teamCNoNight;
-      els.requiredDInput.value = state.settings.requiredD;
-      els.requiredEInput.value = state.settings.requiredE;
-      els.requiredNInput.value = state.settings.requiredN;
+      els.teamAInput.value = state.settings.teamSizes.A;
+      els.teamBInput.value = state.settings.teamSizes.B;
+      els.teamCInput.value = state.settings.teamSizes.C;
+      els.teamDInput.value = state.settings.teamSizes.D;
+      els.teamEInput.value = state.settings.teamSizes.E;
+      els.teamCoverageInput.checked = !!state.settings.applyTeamCoverage;
+      els.weekdayDInput.value = state.settings.weekdayReq.D;
+      els.weekdayEInput.value = state.settings.weekdayReq.E;
+      els.weekdayNInput.value = state.settings.weekdayReq.N;
+      els.holidayDInput.value = state.settings.holidayReq.D;
+      els.holidayEInput.value = state.settings.holidayReq.E;
+      els.holidayNInput.value = state.settings.holidayReq.N;
+      els.holidayDatesInput.value = state.settings.holidays;
       els.hardRulesInput.value = state.settings.hardRules;
       els.softRulesInput.value = state.settings.softRules;
+      updateTeamFields();
+      updateTotalStaffInput();
     }
 
-    function queueAutoGenerate(){
-      clearTimeout(state.autoTimer);
-      state.autoTimer = setTimeout(function(){
-        generateAndRender(false);
-      }, 500);
+    function queueAutoGenerate(){ clearTimeout(state.autoTimer); state.autoTimer = setTimeout(function(){ generateAndRender(false); }, 500); }
+    function setStatus(message, type){ els.status.className = 'status show ' + (type || 'info'); els.status.textContent = message; }
+
+    function parseHolidaySet(){
+      var set = new Set();
+      var text = String(state.settings.holidays || '');
+      text.split(/[\n,;]+/).forEach(function(raw){ var v = raw.trim(); if(/^\d{4}-\d{2}-\d{2}$/.test(v)) set.add(v); });
+      state.holidaySet = set;
+      return set;
     }
 
-    function setStatus(message, type){
-      els.status.className = 'status show ' + (type || 'info');
-      els.status.textContent = message;
+    function makeDateKey(year, month, day){ return String(year) + '-' + pad2(month) + '-' + pad2(day); }
+    function getDaysInMonth(year, month){ return new Date(year, month, 0).getDate(); }
+    function getDowLabel(year, month, day){ var labels = ['일','월','화','수','목','금','토']; return labels[new Date(year, month - 1, day).getDay()]; }
+    function isWeekend(year, month, dayIndex){ var wd = new Date(year, month - 1, dayIndex + 1).getDay(); return wd === 0 || wd === 6; }
+    function isHoliday(year, month, dayIndex){ return state.holidaySet.has(makeDateKey(year, month, dayIndex + 1)); }
+    function isHolidayLike(year, month, dayIndex){ return isWeekend(year, month, dayIndex) || isHoliday(year, month, dayIndex); }
+    function getDayClass(year, month, day){ var dayIndex = day - 1; if(isHoliday(year, month, dayIndex)) return 'holiday'; var wd = new Date(year, month - 1, day).getDay(); if(wd === 0) return 'sun'; if(wd === 6) return 'sat'; return ''; }
+    function getDayTypeLabel(dayIndex){ return isHolidayLike(state.settings.year, state.settings.month, dayIndex) ? '주말/공휴일' : '평일'; }
+    function getRequiredForDay(dayIndex){ return isHolidayLike(state.settings.year, state.settings.month, dayIndex) ? { D: clamp(parseInt(state.settings.holidayReq.D, 10) || 0, 0, 30), E: clamp(parseInt(state.settings.holidayReq.E, 10) || 0, 0, 30), N: clamp(parseInt(state.settings.holidayReq.N, 10) || 0, 0, 30) } : { D: clamp(parseInt(state.settings.weekdayReq.D, 10) || 0, 0, 30), E: clamp(parseInt(state.settings.weekdayReq.E, 10) || 0, 0, 30), N: clamp(parseInt(state.settings.weekdayReq.N, 10) || 0, 0, 30) }; }
+    function getActiveTeamLabels(){ return 'ABCDE'.split('').slice(0, clamp(parseInt(state.settings.teamCount, 10) || 2, 2, 5)); }
+
+    function updateTeamFields(){
+      var active = getActiveTeamLabels();
+      Array.prototype.forEach.call(document.querySelectorAll('.team-field'), function(node){ node.classList.toggle('hidden', active.indexOf(node.getAttribute('data-team')) === -1); });
     }
 
-    function clearStatus(){
-      els.status.className = 'status';
-      els.status.textContent = '';
-    }
-
-    function getDaysInMonth(year, month){
-      return new Date(year, month, 0).getDate();
-    }
-
-    function getDayClass(year, month, day){
-      var wd = new Date(year, month - 1, day).getDay();
-      if(wd === 0) return 'sun';
-      if(wd === 6) return 'sat';
-      return '';
-    }
-
-    function getDowLabel(year, month, day){
-      var labels = ['일','월','화','수','목','금','토'];
-      return labels[new Date(year, month - 1, day).getDay()];
-    }
-
-    function isWeekend(year, month, dayIndex){
-      var wd = new Date(year, month - 1, dayIndex + 1).getDay();
-      return wd === 0 || wd === 6;
+    function updateTotalStaffInput(){
+      var active = getActiveTeamLabels();
+      var total = 0;
+      active.forEach(function(team){ total += clamp(parseInt(state.settings.teamSizes[team], 10) || 0, 0, 60); });
+      els.totalStaffInput.value = String(total);
+      return total;
     }
 
     function buildStaffList(){
-      var labels = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').slice(0, clamp(state.settings.teamCount, 1, 26));
-      var count = clamp(state.settings.staffCount, 1, 60);
-      var base = Math.floor(count / labels.length);
-      var rem = count % labels.length;
+      var active = getActiveTeamLabels();
       var staff = [];
       var id = 0;
-      for(var t = 0; t < labels.length; t++){
-        var size = base + (rem > 0 ? 1 : 0);
-        if(rem > 0) rem -= 1;
+      for(var t = 0; t < active.length; t++){
+        var team = active[t];
+        var size = clamp(parseInt(state.settings.teamSizes[team], 10) || 0, 0, 60);
         for(var i = 0; i < size; i++){
-          staff.push({ id: id, name: '간호사 ' + (id + 1), team: labels[t] });
+          staff.push({ id:id, name:'간호사 ' + (id + 1), team:team });
           id += 1;
         }
       }
       state.staff = staff;
+      state.activeTeams = active.filter(function(team){ return (parseInt(state.settings.teamSizes[team], 10) || 0) > 0; });
       return staff;
     }
 
-    function clamp(n, min, max){
-      return Math.max(min, Math.min(max, n));
-    }
-
-    function makeKey(staffIndex, dayIndex){
-      return staffIndex + '-' + dayIndex;
-    }
+    function clamp(n, min, max){ return Math.max(min, Math.min(max, n)); }
+    function pad2(v){ return String(v).padStart(2, '0'); }
+    function makeKey(staffIndex, dayIndex){ return staffIndex + '-' + dayIndex; }
 
     function parseRules(){
       var hard = String(state.settings.hardRules || '');
       var soft = String(state.settings.softRules || '');
-      function pick(regex, fallback){
-        var m = hard.match(regex);
-        if(!m) return fallback;
-        for(var i = 1; i < m.length; i++){
-          if(m[i]) return parseInt(m[i], 10);
-        }
-        return fallback;
-      }
+      function pick(regex, fallback){ var m = hard.match(regex); if(!m) return fallback; for(var i = 1; i < m.length; i++){ if(m[i]) return parseInt(m[i], 10); } return fallback; }
       return {
+        weekly52: /52시간|주\s*52/.test(hard),
         forbidED: /E\s*-\s*D|16시간/.test(hard),
-        requireNOO: /N\s*-\s*O\s*-\s*O|최소\s*2일\s*휴무/.test(hard),
-        maxConsecutiveWork: pick(/연속\s*근무\s*(\d+)일|최대\s*연속\s*근무\s*(\d+)일/, 5),
-        maxConsecutiveNight: pick(/연속\s*야간\D*(\d+)일|야간\(N\)\s*근무\s*최대\s*(\d+)일|연속\s*야간\(N\)\s*근무\s*최대\s*(\d+)일/, 3),
-        forbidNOFD: /N\s*-\s*OF?\s*-\s*D/.test(hard),
-        softMinimizeAlternating: /퐁당|D\s*-\s*O\s*-\s*D/.test(soft),
-        softWeekendOffBalance: /주말\s*오프\s*균등/.test(soft)
+        forbidNOFD: /N\s*-\s*O(?:FF|F)?\s*-\s*D/i.test(hard),
+        requireNOO: /2\s*off|2일\s*Off|2일\s*휴무|N.*후.*2일/i.test(hard),
+        maxConsecutiveWork: pick(/연속\s*근무\D*(\d+)일|최대\D*연속\D*근무\D*(\d+)일/, 5),
+        maxConsecutiveNight: pick(/최대\D*(\d+)\s*연속|연속\D*야간\D*(\d+)일|Night\(N\)\D*최대\D*(\d+)\D*연속/, 3),
+        maxMonthlyN: pick(/월\D*(\d+)\s*(?:개|회)|Night\(N\)\D*(\d+)\s*(?:개|회)/, 8),
+        minimumOffTarget: /주말.*공휴일.*보장/.test(hard),
+        softMinimizeAlternating: /퐁당|D\s*-\s*O\s*-\s*D/i.test(soft),
+        softWeekendOffBalance: /주말\s*오프\s*균등/i.test(soft),
+        softBalanceShifts: /편중\s*최소|균등/.test(soft)
       };
     }
+
+    function countHolidayLikeDaysInMonth(){ var days = getDaysInMonth(state.settings.year, state.settings.month); var count = 0; for(var d = 0; d < days; d++){ if(isHolidayLike(state.settings.year, state.settings.month, d)) count += 1; } return count; }
 
     function generateAndRender(showSuccess){
       clearTimeout(state.autoTimer);
       var t0 = Date.now();
+      updateTeamFields();
+      updateTotalStaffInput();
+      parseHolidaySet();
       buildStaffList();
       trimRequestOffByCurrentShape();
       renderAll();
       try{
         setStatus('스케줄 계산 중...', 'info');
         var result = generateSchedule();
-        if(!result){
-          state.schedule = null;
-          state.lastMeta = null;
-          renderAll();
-          setStatus('조건이 너무 복잡합니다. 룰을 완화해주세요.', 'error');
-          return;
-        }
+        if(!result){ state.schedule = null; state.lastMeta = null; renderAll(); setStatus('조건이 너무 복잡합니다. 룰을 완화해주세요.', 'error'); return; }
         state.schedule = result.schedule;
-        state.lastMeta = {
-          runtimeMs: Date.now() - t0,
-          attempts: result.attempts,
-          rules: result.rules
-        };
+        state.lastMeta = { runtimeMs: Date.now() - t0, attempts: result.attempts };
         renderAll();
         saveState();
-        if(showSuccess){
-          setStatus('스케줄 생성 완료 · ' + state.lastMeta.runtimeMs + 'ms', 'success');
-        }else{
-          setStatus('자동 반영 완료 · ' + state.lastMeta.runtimeMs + 'ms', 'info');
-        }
-      }catch(err){
-        state.schedule = null;
-        state.lastMeta = null;
-        renderAll();
-        setStatus(err && err.message ? err.message : '오류가 발생했습니다.', 'error');
-      }
+        setStatus((showSuccess ? '스케줄 생성 완료' : '자동 반영 완료') + ' · ' + state.lastMeta.runtimeMs + 'ms', showSuccess ? 'success' : 'info');
+      }catch(err){ state.schedule = null; state.lastMeta = null; renderAll(); setStatus(err && err.message ? err.message : '오류가 발생했습니다.', 'error'); }
     }
 
     function trimRequestOffByCurrentShape(){
-      var maxStaff = clamp(state.settings.staffCount, 1, 60);
+      var maxStaff = state.staff.length;
       var maxDays = getDaysInMonth(state.settings.year, state.settings.month);
       var next = {};
       Object.keys(state.requestOff || {}).forEach(function(key){
@@ -573,53 +526,51 @@
         var parts = key.split('-');
         var i = parseInt(parts[0], 10);
         var d = parseInt(parts[1], 10);
-        if(i >= 0 && i < maxStaff && d >= 0 && d < maxDays){
-          next[key] = true;
-        }
+        if(i >= 0 && i < maxStaff && d >= 0 && d < maxDays) next[key] = true;
       });
       state.requestOff = next;
     }
 
-    function generateSchedule(){
-      var staff = state.staff;
+    function validateSettings(){
+      var activeTeams = state.activeTeams;
+      if(activeTeams.length === 0) throw new Error('활성 팀 인원이 0명입니다. 팀별 인원수를 확인해주세요.');
+      activeTeams.forEach(function(team){ if((parseInt(state.settings.teamSizes[team], 10) || 0) <= 0) throw new Error(team + '팀 인원수가 0명입니다.'); });
+      var totalStaff = state.staff.length;
+      var maxReqSum = 0;
       var days = getDaysInMonth(state.settings.year, state.settings.month);
-      var rules = parseRules();
-      var req = {
-        D: clamp(parseInt(state.settings.requiredD, 10) || 0, 0, 30),
-        E: clamp(parseInt(state.settings.requiredE, 10) || 0, 0, 30),
-        N: clamp(parseInt(state.settings.requiredN, 10) || 0, 0, 30)
-      };
-      var totalRequired = req.D + req.E + req.N;
-      if(staff.length < totalRequired){
-        throw new Error('전체 인원이 하루 필수 인원 합계보다 적습니다.');
-      }
-      if(state.settings.teamCNoNight && state.settings.teamCount >= 3){
-        var nightCap = staff.filter(function(s){ return s.team !== 'C'; }).length;
-        if(nightCap < req.N){
-          throw new Error('C팀 나이트 제외 조건 때문에 나이트 가능 인원이 부족합니다.');
+      for(var d = 0; d < days; d++){
+        var req = getRequiredForDay(d);
+        maxReqSum = Math.max(maxReqSum, req.D + req.E + req.N);
+        if(state.settings.applyTeamCoverage){
+          ['D','E','N'].forEach(function(shift){
+            if(req[shift] > 0 && req[shift] < activeTeams.length){
+              throw new Error(getDayTypeLabel(d) + ' ' + shift + ' 필수 인원이 팀 수보다 적습니다. (각 팀 최소 1명 규칙)');
+            }
+          });
         }
       }
+      if(totalStaff < maxReqSum) throw new Error('전체 인원이 하루 최대 필수 인원 합계보다 적습니다.');
+    }
 
+    function generateSchedule(){
+      validateSettings();
+      var staff = state.staff;
+      var activeTeams = state.activeTeams.slice();
+      var days = getDaysInMonth(state.settings.year, state.settings.month);
+      var rules = parseRules();
+      var minOffTarget = rules.minimumOffTarget ? countHolidayLikeDaysInMonth() : 0;
       var deadline = Date.now() + 2900;
       var attempts = 0;
 
       while(Date.now() < deadline){
         attempts += 1;
-        var rng = mulberry32(123456 + attempts * 97);
+        var rng = mulberry32(987654 + attempts * 97);
         var schedule = Array.from({length: staff.length}, function(){ return Array(days).fill(null); });
-        var counts = Array.from({length: staff.length}, function(){
-          return { D:0, E:0, N:0, O:0, work:0, weekendOff:0 };
-        });
+        var counts = Array.from({length: staff.length}, function(){ return { D:0, E:0, N:0, O:0, work:0, weekendOff:0 }; });
 
         function isWork(v){ return v === 'D' || v === 'E' || v === 'N'; }
-
-        function countStreak(staffIndex, dayIndex, predicate){
-          var streak = 0;
-          for(var d = dayIndex; d >= 0; d--){
-            if(predicate(schedule[staffIndex][d])) streak += 1; else break;
-          }
-          return streak;
-        }
+        function countBackwards(staffIndex, startDay, predicate){ var streak = 0; for(var d = startDay; d >= 0; d--){ if(predicate(schedule[staffIndex][d])) streak += 1; else break; } return streak; }
+        function countWindowWork(staffIndex, fromDay, toDay){ var c = 0; for(var d = Math.max(0, fromDay); d <= Math.min(days - 1, toDay); d++){ if(isWork(schedule[staffIndex][d])) c += 1; } return c; }
 
         function allowedShifts(staffIndex, dayIndex){
           var prev1 = dayIndex > 0 ? schedule[staffIndex][dayIndex - 1] : null;
@@ -627,32 +578,32 @@
           var opts = ['O','D','E','N'];
 
           if(state.requestOff[makeKey(staffIndex, dayIndex)]) return ['O'];
-          if(prev2 === 'N' && prev1 === 'O' && rules.requireNOO) return ['O'];
-          if(prev1 === 'N' && rules.requireNOO) opts = ['O','N'];
-          if(prev1 === 'E' && rules.forbidED) opts = opts.filter(function(v){ return v !== 'D'; });
-          if(state.settings.teamCNoNight && state.settings.teamCount >= 3 && staff[staffIndex].team === 'C'){
-            opts = opts.filter(function(v){ return v !== 'N'; });
+          if(rules.requireNOO){
+            if(prev2 === 'N' && prev1 === 'O') return ['O'];
+            if(prev1 === 'N') opts = opts.filter(function(v){ return v === 'O' || v === 'N'; });
           }
-          var workStreak = countStreak(staffIndex, dayIndex - 1, isWork);
-          if(rules.maxConsecutiveWork && workStreak >= rules.maxConsecutiveWork){
-            opts = opts.filter(function(v){ return !isWork(v); });
-          }
-          var nightStreak = countStreak(staffIndex, dayIndex - 1, function(v){ return v === 'N'; });
-          if(rules.maxConsecutiveNight && nightStreak >= rules.maxConsecutiveNight){
-            opts = opts.filter(function(v){ return v !== 'N'; });
-          }
-          if(rules.forbidNOFD && prev2 === 'N' && prev1 === 'O'){
-            opts = opts.filter(function(v){ return v !== 'D'; });
+          if(rules.forbidED && prev1 === 'E') opts = opts.filter(function(v){ return v !== 'D'; });
+          if(rules.forbidNOFD && prev2 === 'N' && prev1 === 'O') opts = opts.filter(function(v){ return v !== 'D'; });
+          if(rules.maxConsecutiveWork && countBackwards(staffIndex, dayIndex - 1, isWork) >= rules.maxConsecutiveWork) opts = opts.filter(function(v){ return !isWork(v); });
+          if(rules.maxConsecutiveNight && countBackwards(staffIndex, dayIndex - 1, function(v){ return v === 'N'; }) >= rules.maxConsecutiveNight) opts = opts.filter(function(v){ return v !== 'N'; });
+          if(rules.maxMonthlyN && counts[staffIndex].N >= rules.maxMonthlyN) opts = opts.filter(function(v){ return v !== 'N'; });
+          if(rules.weekly52 && countWindowWork(staffIndex, dayIndex - 6, dayIndex - 1) >= 6) opts = opts.filter(function(v){ return !isWork(v); });
+          if(minOffTarget > 0){
+            opts = opts.filter(function(shift){
+              var currentOff = counts[staffIndex].O;
+              var offAfterChoice = currentOff + (shift === 'O' ? 1 : 0);
+              var remainingAfter = days - dayIndex - 1;
+              return offAfterChoice + remainingAfter >= minOffTarget;
+            });
           }
           return opts;
         }
 
         function candidateScore(staffIndex, dayIndex, shift){
-          var score = counts[staffIndex][shift] * 10 + counts[staffIndex].work;
+          var score = counts[staffIndex][shift] * 8 + counts[staffIndex].work * 2;
           if(shift === 'N') score += counts[staffIndex].N * 12;
-          if(rules.softWeekendOffBalance && isWeekend(state.settings.year, state.settings.month, dayIndex)){
-            score -= counts[staffIndex].weekendOff * 5;
-          }
+          if(rules.softBalanceShifts) score += (counts[staffIndex].D + counts[staffIndex].E + counts[staffIndex].N);
+          if(rules.softWeekendOffBalance && isHolidayLike(state.settings.year, state.settings.month, dayIndex) && shift !== 'O') score += counts[staffIndex].weekendOff * 4;
           if(rules.softMinimizeAlternating){
             var prev1 = dayIndex > 0 ? schedule[staffIndex][dayIndex - 1] : null;
             var prev2 = dayIndex > 1 ? schedule[staffIndex][dayIndex - 2] : null;
@@ -667,8 +618,9 @@
           if(Date.now() > deadline) return false;
           if(dayIndex === days) return true;
 
+          var req = getRequiredForDay(dayIndex);
           var optionsByStaff = Array.from({length: staff.length}, function(_, i){ return allowedShifts(i, dayIndex); });
-          ['N','D','E'].forEach(function(shift){
+          ['D','E','N'].forEach(function(shift){
             var count = 0;
             for(var i = 0; i < staff.length; i++) if(optionsByStaff[i].indexOf(shift) !== -1) count += 1;
             if(count < req[shift]) throw { kind:'fail' };
@@ -677,31 +629,28 @@
           var dayAssign = Array(staff.length).fill('O');
           var remaining = [];
           for(var i = 0; i < staff.length; i++) remaining.push(i);
-
           var shifts = ['N','D','E'].sort(function(a,b){
             var aCount = 0, bCount = 0;
             for(var x = 0; x < staff.length; x++){
               if(optionsByStaff[x].indexOf(a) !== -1) aCount += 1;
               if(optionsByStaff[x].indexOf(b) !== -1) bCount += 1;
             }
-            return (aCount / Math.max(req[a],1)) - (bCount / Math.max(req[b],1));
+            return (aCount / Math.max(req[a], 1)) - (bCount / Math.max(req[b], 1));
           });
 
           function assignShiftType(typeIndex){
             if(Date.now() > deadline) return false;
             if(typeIndex === shifts.length){
-              for(var r = 0; r < remaining.length; r++){
-                if(optionsByStaff[remaining[r]].indexOf('O') === -1) return false;
-              }
+              for(var r = 0; r < remaining.length; r++) if(optionsByStaff[remaining[r]].indexOf('O') === -1) return false;
               for(var i = 0; i < staff.length; i++){
                 schedule[i][dayIndex] = dayAssign[i];
                 counts[i][dayAssign[i]] += 1;
                 if(isWork(dayAssign[i])) counts[i].work += 1;
-                if(dayAssign[i] === 'O' && isWeekend(state.settings.year, state.settings.month, dayIndex)) counts[i].weekendOff += 1;
+                if(dayAssign[i] === 'O' && isHolidayLike(state.settings.year, state.settings.month, dayIndex)) counts[i].weekendOff += 1;
               }
               if(searchDay(dayIndex + 1)) return true;
               for(var j = 0; j < staff.length; j++){
-                if(dayAssign[j] === 'O' && isWeekend(state.settings.year, state.settings.month, dayIndex)) counts[j].weekendOff -= 1;
+                if(dayAssign[j] === 'O' && isHolidayLike(state.settings.year, state.settings.month, dayIndex)) counts[j].weekendOff -= 1;
                 if(isWork(dayAssign[j])) counts[j].work -= 1;
                 counts[j][dayAssign[j]] -= 1;
                 schedule[j][dayIndex] = null;
@@ -711,107 +660,124 @@
 
             var shift = shifts[typeIndex];
             var need = req[shift];
-            var candidates = remaining.filter(function(i){ return optionsByStaff[i].indexOf(shift) !== -1; })
-              .sort(function(a,b){ return candidateScore(a, dayIndex, shift) - candidateScore(b, dayIndex, shift); });
+            if(need === 0) return assignShiftType(typeIndex + 1);
 
-            function choose(startIdx, chosen){
-              if(Date.now() > deadline) return false;
-              if(chosen.length === need){
-                var removed = [];
-                chosen.forEach(function(i){
-                  dayAssign[i] = shift;
-                  var pos = remaining.indexOf(i);
-                  if(pos !== -1){
-                    remaining.splice(pos, 1);
-                    removed.push(i);
-                  }
-                });
-                var feasible = true;
-                for(var nextType = typeIndex + 1; nextType < shifts.length; nextType++){
-                  var nextShift = shifts[nextType];
-                  var possible = 0;
-                  for(var rr = 0; rr < remaining.length; rr++){
-                    if(optionsByStaff[remaining[rr]].indexOf(nextShift) !== -1) possible += 1;
-                  }
-                  if(possible < req[nextShift]){ feasible = false; break; }
-                }
-                if(feasible && assignShiftType(typeIndex + 1)) return true;
-                removed.forEach(function(i){
-                  dayAssign[i] = 'O';
-                  remaining.push(i);
-                });
-                return false;
-              }
-              var leftNeed = need - chosen.length;
-              for(var idx = startIdx; idx < candidates.length; idx++){
-                if((candidates.length - idx) < leftNeed) return false;
-                var cand = candidates[idx];
-                if(remaining.indexOf(cand) === -1) continue;
-                chosen.push(cand);
-                if(choose(idx + 1, chosen)) return true;
+            var perTeamCandidates = {};
+            activeTeams.forEach(function(team){
+              perTeamCandidates[team] = remaining.filter(function(idx){ return staff[idx].team === team && optionsByStaff[idx].indexOf(shift) !== -1; })
+                .sort(function(a,b){ return candidateScore(a, dayIndex, shift) - candidateScore(b, dayIndex, shift); })
+                .slice(0, 8);
+            });
+
+            function choosePerTeam(teamPos, chosen){
+              if(teamPos === (state.settings.applyTeamCoverage ? activeTeams.length : 0)) return chooseExtras(chosen, need - chosen.length);
+              var team = activeTeams[teamPos];
+              var candidates = perTeamCandidates[team];
+              if(!candidates || !candidates.length) return false;
+              for(var c = 0; c < candidates.length; c++){
+                var idx = candidates[c];
+                if(remaining.indexOf(idx) === -1 || chosen.indexOf(idx) !== -1) continue;
+                chosen.push(idx);
+                if(choosePerTeam(teamPos + 1, chosen)) return true;
                 chosen.pop();
               }
               return false;
             }
 
-            return choose(0, []);
+            function chooseExtras(chosen, extrasNeed){
+              var chosenSet = {};
+              chosen.forEach(function(idx){ chosenSet[idx] = true; });
+              var extraCandidates = remaining.filter(function(idx){ return !chosenSet[idx] && optionsByStaff[idx].indexOf(shift) !== -1; })
+                .sort(function(a,b){ return candidateScore(a, dayIndex, shift) - candidateScore(b, dayIndex, shift); })
+                .slice(0, Math.max(12, extrasNeed + 6));
+
+              function recurse(startIdx, picks){
+                if(picks.length === extrasNeed){
+                  var finalChosen = chosen.concat(picks);
+                  var removed = [];
+                  for(var x = 0; x < finalChosen.length; x++){
+                    var idx = finalChosen[x];
+                    dayAssign[idx] = shift;
+                    var pos = remaining.indexOf(idx);
+                    if(pos !== -1){ remaining.splice(pos, 1); removed.push(idx); }
+                  }
+
+                  var feasible = true;
+                  for(var nextType = typeIndex + 1; nextType < shifts.length; nextType++){
+                    var nextShift = shifts[nextType];
+                    var possible = 0;
+                    for(var rr = 0; rr < remaining.length; rr++) if(optionsByStaff[remaining[rr]].indexOf(nextShift) !== -1) possible += 1;
+                    if(possible < req[nextShift]){ feasible = false; break; }
+                    if(feasible && state.settings.applyTeamCoverage && req[nextShift] > 0){
+                      for(var t = 0; t < activeTeams.length; t++){
+                        var team = activeTeams[t];
+                        var teamPossible = 0;
+                        for(var rr2 = 0; rr2 < remaining.length; rr2++){
+                          var idx2 = remaining[rr2];
+                          if(staff[idx2].team === team && optionsByStaff[idx2].indexOf(nextShift) !== -1) teamPossible += 1;
+                        }
+                        if(teamPossible < 1){ feasible = false; break; }
+                      }
+                    }
+                  }
+                  if(feasible && assignShiftType(typeIndex + 1)) return true;
+                  for(var y = 0; y < removed.length; y++){ var idxBack = removed[y]; dayAssign[idxBack] = 'O'; remaining.push(idxBack); }
+                  return false;
+                }
+
+                var leftNeed = extrasNeed - picks.length;
+                if(extraCandidates.length - startIdx < leftNeed) return false;
+                for(var i = startIdx; i < extraCandidates.length; i++){
+                  var idx = extraCandidates[i];
+                  if(remaining.indexOf(idx) === -1 || picks.indexOf(idx) !== -1) continue;
+                  picks.push(idx);
+                  if(recurse(i + 1, picks)) return true;
+                  picks.pop();
+                }
+                return false;
+              }
+              return recurse(0, []);
+            }
+
+            if(state.settings.applyTeamCoverage) return choosePerTeam(0, []);
+            return chooseExtras([], need);
           }
 
-          try{
-            return assignShiftType(0);
-          }catch(inner){
-            if(inner && inner.kind === 'fail') return false;
-            throw inner;
-          }
+          try{ return assignShiftType(0); }catch(inner){ if(inner && inner.kind === 'fail') return false; throw inner; }
         }
 
-        if(searchDay(0)){
-          return { schedule: schedule, attempts: attempts, rules: rules };
-        }
+        if(searchDay(0)) return { schedule:schedule, attempts:attempts };
       }
       return null;
     }
 
-    function renderAll(){
-      buildStaffList();
-      trimRequestOffByCurrentShape();
-      renderSummary();
-      renderScheduleTable();
-      renderPersonalStats();
-      renderDailyStats();
-    }
-
-    function renderSummary(){
-      els.statStaff.textContent = String(state.staff.length);
-      els.statRequestedOff.textContent = String(Object.keys(state.requestOff || {}).filter(function(k){ return state.requestOff[k]; }).length);
-    }
+    function renderAll(){ parseHolidaySet(); updateTeamFields(); updateTotalStaffInput(); buildStaffList(); trimRequestOffByCurrentShape(); renderSummary(); renderScheduleTable(); renderPersonalStats(); renderDailyStats(); }
+    function renderSummary(){ els.statStaff.textContent = String(state.staff.length); els.statRequestedOff.textContent = String(Object.keys(state.requestOff || {}).filter(function(k){ return state.requestOff[k]; }).length); }
 
     function renderScheduleTable(){
       var days = getDaysInMonth(state.settings.year, state.settings.month);
       var html = '<table><thead><tr><th class="sticky-left">이름</th>';
       for(var day = 1; day <= days; day++){
         var dayClass = getDayClass(state.settings.year, state.settings.month, day);
-        html += '<th class="' + dayClass + '"><div class="day-head"><span class="num">' + day + '</span><span class="dow">' + getDowLabel(state.settings.year, state.settings.month, day) + '</span></div></th>';
+        var dateKey = makeDateKey(state.settings.year, state.settings.month, day);
+        var isH = state.holidaySet.has(dateKey);
+        html += '<th class="' + dayClass + '" title="' + escapeHtml(dateKey + (isH ? ' 공휴일' : '')) + '"><div class="day-head"><span class="num">' + day + '</span><span class="dow">' + getDowLabel(state.settings.year, state.settings.month, day) + '</span></div></th>';
       }
       html += '</tr></thead><tbody>';
-
       for(var i = 0; i < state.staff.length; i++){
         var nurse = state.staff[i];
-        html += '<tr>';
-        html += '<td class="sticky-left"><div class="name-cell"><div class="name">' + escapeHtml(nurse.name) + '</div><div class="subname">' + escapeHtml(nurse.team + '팀') + '</div></div></td>';
+        html += '<tr><td class="sticky-left"><div class="name-cell"><div class="name">' + escapeHtml(nurse.name) + '</div><div class="subname">' + escapeHtml(nurse.team + '팀') + '</div></div></td>';
         for(var d = 0; d < days; d++){
           var key = makeKey(i, d);
           var isLocked = !!state.requestOff[key];
           var shift = isLocked ? 'O' : (state.schedule && state.schedule[i] ? state.schedule[i][d] : '');
           var cls = shift ? ('shift-' + shift) : 'shift-empty';
-          var label = shift || '';
-          html += '<td><div class="shift-cell ' + cls + '" data-staff="' + i + '" data-day="' + d + '">' + label + (isLocked ? '<small>🔒</small>' : '') + '</div></td>';
+          html += '<td><div class="shift-cell ' + cls + '" data-staff="' + i + '" data-day="' + d + '">' + (shift || '') + (isLocked ? '<small>🔒</small>' : '') + '</div></td>';
         }
         html += '</tr>';
       }
       html += '</tbody></table>';
       els.scheduleWrap.innerHTML = html;
-
       Array.prototype.forEach.call(els.scheduleWrap.querySelectorAll('.shift-cell'), function(cell){
         cell.addEventListener('click', function(){
           var staffIndex = parseInt(cell.getAttribute('data-staff'), 10);
@@ -842,38 +808,22 @@
     function renderPersonalStats(){
       var rows = computePersonalStats();
       var html = '<table><thead><tr><th>이름</th><th>팀</th><th>D</th><th>E</th><th>N</th><th>O</th><th>근무합</th></tr></thead><tbody>';
-      rows.forEach(function(r){
-        html += '<tr>' +
-          '<td>' + escapeHtml(r.name) + '</td>' +
-          '<td>' + escapeHtml(r.team) + '</td>' +
-          '<td>' + r.D + '</td>' +
-          '<td>' + r.E + '</td>' +
-          '<td>' + r.N + '</td>' +
-          '<td>' + r.O + '</td>' +
-          '<td>' + r.work + '</td>' +
-          '</tr>';
-      });
+      rows.forEach(function(r){ html += '<tr><td>' + escapeHtml(r.name) + '</td><td>' + escapeHtml(r.team) + '</td><td>' + r.D + '</td><td>' + r.E + '</td><td>' + r.N + '</td><td>' + r.O + '</td><td>' + r.work + '</td></tr>'; });
       html += '</tbody></table>';
       els.personalStatsWrap.innerHTML = html;
     }
 
     function renderDailyStats(){
       var days = getDaysInMonth(state.settings.year, state.settings.month);
-      var html = '<table><thead><tr><th>날짜</th><th>D</th><th>E</th><th>N</th><th>O</th><th>목표</th></tr></thead><tbody>';
+      var html = '<table><thead><tr><th>날짜</th><th>유형</th><th>D</th><th>E</th><th>N</th><th>O</th><th>목표</th></tr></thead><tbody>';
       for(var d = 0; d < days; d++){
         var c = { D:0, E:0, N:0, O:0 };
         for(var i = 0; i < state.staff.length; i++){
           var shift = state.requestOff[makeKey(i, d)] ? 'O' : (state.schedule && state.schedule[i] ? state.schedule[i][d] : '');
           if(shift && c.hasOwnProperty(shift)) c[shift] += 1;
         }
-        html += '<tr>' +
-          '<td>' + (d + 1) + '일 (' + getDowLabel(state.settings.year, state.settings.month, d + 1) + ')</td>' +
-          '<td>' + c.D + '</td>' +
-          '<td>' + c.E + '</td>' +
-          '<td>' + c.N + '</td>' +
-          '<td>' + c.O + '</td>' +
-          '<td>D ' + state.settings.requiredD + ' / E ' + state.settings.requiredE + ' / N ' + state.settings.requiredN + '</td>' +
-          '</tr>';
+        var req = getRequiredForDay(d);
+        html += '<tr><td>' + (d + 1) + '일 (' + getDowLabel(state.settings.year, state.settings.month, d + 1) + ')</td><td>' + getDayTypeLabel(d) + '</td><td>' + c.D + '</td><td>' + c.E + '</td><td>' + c.N + '</td><td>' + c.O + '</td><td>D ' + req.D + ' / E ' + req.E + ' / N ' + req.N + '</td></tr>';
       }
       html += '</tbody></table>';
       els.dailyStatsWrap.innerHTML = html;
@@ -886,98 +836,50 @@
       for(var d = 1; d <= days; d++) header.push(String(d));
       header.push('D 합계','E 합계','N 합계','O 합계');
       rows.push(header);
-
       var stats = computePersonalStats();
       stats.forEach(function(s, i){
         var row = [s.name, s.team];
-        for(var d = 0; d < days; d++){
-          row.push(state.requestOff[makeKey(i, d)] ? 'O' : (state.schedule && state.schedule[i] ? state.schedule[i][d] : ''));
-        }
+        for(var d = 0; d < days; d++) row.push(state.requestOff[makeKey(i, d)] ? 'O' : (state.schedule && state.schedule[i] ? state.schedule[i][d] : ''));
         row.push(String(s.D), String(s.E), String(s.N), String(s.O));
         rows.push(row);
       });
-
       rows.push([]);
-      rows.push(['날짜','D','E','N','O']);
+      rows.push(['날짜','유형','D','E','N','O','목표']);
       for(var day = 0; day < days; day++){
         var c = {D:0,E:0,N:0,O:0};
         for(var i = 0; i < state.staff.length; i++){
           var shift = state.requestOff[makeKey(i, day)] ? 'O' : (state.schedule && state.schedule[i] ? state.schedule[i][day] : '');
           if(c.hasOwnProperty(shift)) c[shift] += 1;
         }
-        rows.push([String(day + 1), String(c.D), String(c.E), String(c.N), String(c.O)]);
+        var req = getRequiredForDay(day);
+        rows.push([String(day + 1), getDayTypeLabel(day), String(c.D), String(c.E), String(c.N), String(c.O), 'D ' + req.D + ' / E ' + req.E + ' / N ' + req.N]);
       }
-
-      return '\uFEFF' + rows.map(function(row){
-        return row.map(csvEscape).join(',');
-      }).join('\n');
+      return '\uFEFF' + rows.map(function(row){ return row.map(csvEscape).join(','); }).join('\n');
     }
 
-    function csvEscape(value){
-      var v = value == null ? '' : String(value);
-      if(/[",\n]/.test(v)) return '"' + v.replace(/"/g, '""') + '"';
-      return v;
-    }
+    function csvEscape(value){ var v = value == null ? '' : String(value); if(/[",\n]/.test(v)) return '"' + v.replace(/"/g, '""') + '"'; return v; }
 
     function downloadCsv(){
-      if(!state.schedule){
-        setStatus('먼저 스케줄을 생성해주세요.', 'error');
-        return;
-      }
+      if(!state.schedule){ setStatus('먼저 스케줄을 생성해주세요.', 'error'); return; }
       var csv = scheduleToCsv();
       var filename = 'nurse_schedule_' + state.settings.year + '_' + pad2(state.settings.month) + '.csv';
       try{
         var blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
         var file = null;
-        try {
-          file = new File([blob], filename, { type:'text/csv;charset=utf-8;' });
-        } catch (_) {}
-
+        try { file = new File([blob], filename, { type:'text/csv;charset=utf-8;' }); } catch (_) {}
         if(file && navigator.canShare && navigator.canShare({ files:[file] }) && navigator.share){
-          navigator.share({
-            files:[file],
-            title:'간호사 스케줄 CSV',
-            text:'CSV 파일을 저장하거나 공유하세요.'
-          }).catch(function(){});
+          navigator.share({ files:[file], title:'간호사 스케줄 CSV', text:'CSV 파일을 저장하거나 공유하세요.' }).catch(function(){});
           return;
         }
-
         var url = URL.createObjectURL(blob);
         var a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        document.body.appendChild(a);
-        a.click();
-        setTimeout(function(){
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }, 200);
-      }catch(e){
-        setStatus('CSV 생성에 실패했습니다.', 'error');
-      }
+        a.href = url; a.download = filename; document.body.appendChild(a); a.click();
+        setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+      }catch(e){ setStatus('CSV 생성에 실패했습니다.', 'error'); }
     }
 
-    function pad2(v){
-      return String(v).padStart(2, '0');
-    }
-
-    function escapeHtml(str){
-      return String(str == null ? '' : str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
-        .replace(/'/g, '&#39;');
-    }
-
-    function mulberry32(a){
-      return function(){
-        var t = a += 0x6D2B79F5;
-        t = Math.imul(t ^ (t >>> 15), t | 1);
-        t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-      };
-    }
+    function escapeHtml(str){ return String(str == null ? '' : str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
+    function mulberry32(a){ return function(){ var t = a += 0x6D2B79F5; t = Math.imul(t ^ (t >>> 15), t | 1); t ^= t + Math.imul(t ^ (t >>> 7), t | 61); return ((t ^ (t >>> 14)) >>> 0) / 4294967296; }; }
   })();
   </script>
 </body>
