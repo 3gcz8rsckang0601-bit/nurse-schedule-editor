@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#0f172a" />
-  <title>모바일 간호사 스케줄러 v2</title>
+  <title>모바일 간호사 스케줄러 v3</title>
   <style>
     :root{
       --bg:#f8fafc;
@@ -122,8 +122,8 @@
   <div class="app">
     <div class="topbar">
       <div class="title-card">
-        <h1 class="title">모바일 간호사 스케줄러 v2</h1>
-        <p class="subtitle">팀별 인원수, 평일/주말·공휴일 필수인원, 공휴일 입력을 지원하는 확장 버전입니다. 셀을 탭하면 요청 오프(O)가 고정됩니다.</p>
+        <h1 class="title">모바일 간호사 스케줄러 v3</h1>
+        <p class="subtitle">팀별 인원수, 평일/주말·공휴일 필수인원, 공휴일 입력을 지원하는 안정화 버전입니다. Night 후 2일 Off는 선호 규칙으로 반영되며, 셀을 탭하면 요청 오프(O)가 고정됩니다.</p>
         <div class="quick-actions">
           <button type="button" id="generateBtn" class="btn btn-primary wide">⚡ 스케줄 생성 / 다시 계산</button>
           <button type="button" id="csvBtn" class="btn">📥 CSV 다운로드</button>
@@ -261,16 +261,14 @@
     </div>
 
     <div class="section"><div class="section-head">개인별 통계</div><div class="small-table" id="personalStatsWrap"></div></div>
-    <div class="section"><div class="section-head">날짜별 투입 현황</div><div class="small-table" id="dailyStatsWrap"></div></div>
-
-    <div class="footer-note">CSV 버튼은 아이폰 사파리에서 다운로드 대신 공유창으로 열릴 수 있습니다. 현재 규칙은 브라우저 내부에서 계산되며, 3초 내 해를 못 찾으면 경고 메시지를 표시합니다.</div>
+        <div class="footer-note">CSV 버튼은 아이폰 사파리에서 다운로드 대신 공유창으로 열릴 수 있습니다. 현재 규칙은 브라우저 내부에서 계산되며, 탐색 실패 시 선호 규칙을 먼저 완화하는 방식으로 다시 시도합니다.</div>
   </div>
 
   <script>
   (function(){
     'use strict';
 
-    var STORAGE_KEY = 'nurse_scheduler_mobile_v2';
+    var STORAGE_KEY = 'nurse_scheduler_mobile_v3';
     var DEFAULTS = {
       year: 2026,
       month: 5,
@@ -279,9 +277,9 @@
       applyTeamCoverage: true,
       weekdayReq: { D:2, E:3, N:2 },
       holidayReq: { D:2, E:2, N:2 },
-      holidays: '2026-05-05, 2026-05-25',
-      hardRules: '1. 1일 근무시간은 8시간으로 하며, 주당 총 근무시간은 52시간을 초과할 수 없다.\n2. 근무와 근무 사이에는 최소 16시간 이상의 휴게시간을 보장한다.\n3. N-OFF-D 및 E-D 패턴은 금지한다.\n4. 연속 근무는 최대 5일까지 허용한다.\n5. Night(N) 근무는 개인별 월 8회 이하이며, 최대 3연속까지만 허용한다.\n6. Night(N) 근무 후에는 최소 2일 Off를 반드시 보장한다.\n7. Off 수는 해당 월의 주말 및 공휴일 수 이상으로 보장한다.',
-      softRules: '1. 퐁당퐁당(D-O-D-O) 근무 최소화\n2. 주말 오프 균등 배분\n3. 개인별 D/E/N 편중 최소화'
+      holidays: '2026-05-01, 2026-05-05, 2026-05-25',
+      hardRules: '1. 1일 근무시간은 8시간으로 하며, 주당 총 근무시간은 52시간을 초과할 수 없다.\n2. 근무와 근무 사이에는 최소 16시간 이상의 휴게시간을 보장한다.\n3. N-OFF-D 및 E-D 패턴은 금지한다.\n4. 연속 근무는 최대 5일까지 허용한다.\n5. Night(N) 근무는 개인별 월 8회 이하이며, 최대 3연속까지만 허용한다.',
+      softRules: '1. Night(N) 근무 후에는 가능하면 2일 Off를 우선 배치한다.\n2. Off 수는 가능한 범위에서 주말 및 공휴일 수에 최대한 맞춘다.\n3. 퐁당퐁당(D-O-D-O) 근무 최소화\n4. 주말 오프 균등 배분\n5. 개인별 D/E/N 편중 최소화'
     };
 
     var loadedState = safeLoadState();
@@ -324,7 +322,6 @@
       resetBtn: document.getElementById('resetBtn'),
       scheduleWrap: document.getElementById('scheduleWrap'),
       personalStatsWrap: document.getElementById('personalStatsWrap'),
-      dailyStatsWrap: document.getElementById('dailyStatsWrap'),
       statStaff: document.getElementById('statStaff'),
       statRequestedOff: document.getElementById('statRequestedOff')
     };
@@ -483,11 +480,11 @@
         weekly52: /52시간|주\s*52/.test(hard),
         forbidED: /E\s*-\s*D|16시간/.test(hard),
         forbidNOFD: /N\s*-\s*O(?:FF|F)?\s*-\s*D/i.test(hard),
-        requireNOO: /2\s*off|2일\s*Off|2일\s*휴무|N.*후.*2일/i.test(hard),
         maxConsecutiveWork: pick(/연속\s*근무\D*(\d+)일|최대\D*연속\D*근무\D*(\d+)일/, 5),
         maxConsecutiveNight: pick(/최대\D*(\d+)\s*연속|연속\D*야간\D*(\d+)일|Night\(N\)\D*최대\D*(\d+)\D*연속/, 3),
         maxMonthlyN: pick(/월\D*(\d+)\s*(?:개|회)|Night\(N\)\D*(\d+)\s*(?:개|회)/, 8),
-        minimumOffTarget: /주말.*공휴일.*보장/.test(hard),
+        softPreferNOO: /2\s*off|2일\s*Off|2일\s*휴무|N.*후.*2일/i.test(soft),
+        softOffTarget: /주말.*공휴일.*맞추|주말.*공휴일.*보장/i.test(soft),
         softMinimizeAlternating: /퐁당|D\s*-\s*O\s*-\s*D/i.test(soft),
         softWeekendOffBalance: /주말\s*오프\s*균등/i.test(soft),
         softBalanceShifts: /편중\s*최소|균등/.test(soft)
@@ -558,8 +555,16 @@
       var activeTeams = state.activeTeams.slice();
       var days = getDaysInMonth(state.settings.year, state.settings.month);
       var rules = parseRules();
-      var minOffTarget = rules.minimumOffTarget ? countHolidayLikeDaysInMonth() : 0;
-      var deadline = Date.now() + 2900;
+      var minOffTarget = 0;
+      if(rules.softOffTarget){
+        var totalOffSlots = 0;
+        for(var d0 = 0; d0 < days; d0++){
+          var req0 = getRequiredForDay(d0);
+          totalOffSlots += Math.max(0, staff.length - (req0.D + req0.E + req0.N));
+        }
+        minOffTarget = Math.min(countHolidayLikeDaysInMonth(), Math.floor(totalOffSlots / Math.max(staff.length, 1)));
+      }
+      var deadline = Date.now() + 6000;
       var attempts = 0;
 
       while(Date.now() < deadline){
@@ -578,35 +583,38 @@
           var opts = ['O','D','E','N'];
 
           if(state.requestOff[makeKey(staffIndex, dayIndex)]) return ['O'];
-          if(rules.requireNOO){
-            if(prev2 === 'N' && prev1 === 'O') return ['O'];
-            if(prev1 === 'N') opts = opts.filter(function(v){ return v === 'O' || v === 'N'; });
-          }
           if(rules.forbidED && prev1 === 'E') opts = opts.filter(function(v){ return v !== 'D'; });
           if(rules.forbidNOFD && prev2 === 'N' && prev1 === 'O') opts = opts.filter(function(v){ return v !== 'D'; });
           if(rules.maxConsecutiveWork && countBackwards(staffIndex, dayIndex - 1, isWork) >= rules.maxConsecutiveWork) opts = opts.filter(function(v){ return !isWork(v); });
           if(rules.maxConsecutiveNight && countBackwards(staffIndex, dayIndex - 1, function(v){ return v === 'N'; }) >= rules.maxConsecutiveNight) opts = opts.filter(function(v){ return v !== 'N'; });
           if(rules.maxMonthlyN && counts[staffIndex].N >= rules.maxMonthlyN) opts = opts.filter(function(v){ return v !== 'N'; });
           if(rules.weekly52 && countWindowWork(staffIndex, dayIndex - 6, dayIndex - 1) >= 6) opts = opts.filter(function(v){ return !isWork(v); });
-          if(minOffTarget > 0){
-            opts = opts.filter(function(shift){
-              var currentOff = counts[staffIndex].O;
-              var offAfterChoice = currentOff + (shift === 'O' ? 1 : 0);
-              var remainingAfter = days - dayIndex - 1;
-              return offAfterChoice + remainingAfter >= minOffTarget;
-            });
-          }
           return opts;
         }
 
         function candidateScore(staffIndex, dayIndex, shift){
           var score = counts[staffIndex][shift] * 8 + counts[staffIndex].work * 2;
+          var prev1 = dayIndex > 0 ? schedule[staffIndex][dayIndex - 1] : null;
+          var prev2 = dayIndex > 1 ? schedule[staffIndex][dayIndex - 2] : null;
           if(shift === 'N') score += counts[staffIndex].N * 12;
           if(rules.softBalanceShifts) score += (counts[staffIndex].D + counts[staffIndex].E + counts[staffIndex].N);
           if(rules.softWeekendOffBalance && isHolidayLike(state.settings.year, state.settings.month, dayIndex) && shift !== 'O') score += counts[staffIndex].weekendOff * 4;
+
+          if(rules.softPreferNOO){
+            if(prev1 === 'N' && shift !== 'O' && shift !== 'N') score += 140;
+            if(prev2 === 'N' && prev1 === 'O' && shift !== 'O') score += 120;
+          }
+
+          if(rules.softOffTarget && minOffTarget > 0){
+            var currentOff = counts[staffIndex].O;
+            var projectedOff = currentOff + (shift === 'O' ? 1 : 0);
+            var remainingAfter = days - dayIndex - 1;
+            var bestPossibleFinalOff = projectedOff + remainingAfter;
+            if(bestPossibleFinalOff < minOffTarget) score += 250;
+            else if(projectedOff < minOffTarget && shift !== 'O') score += (minOffTarget - projectedOff) * 10;
+          }
+
           if(rules.softMinimizeAlternating){
-            var prev1 = dayIndex > 0 ? schedule[staffIndex][dayIndex - 1] : null;
-            var prev2 = dayIndex > 1 ? schedule[staffIndex][dayIndex - 2] : null;
             if(shift === 'D' && prev1 === 'O' && prev2 === 'D') score += 50;
             if(isWork(shift) && prev1 === 'O' && isWork(prev2)) score += 10;
           }
@@ -666,7 +674,7 @@
             activeTeams.forEach(function(team){
               perTeamCandidates[team] = remaining.filter(function(idx){ return staff[idx].team === team && optionsByStaff[idx].indexOf(shift) !== -1; })
                 .sort(function(a,b){ return candidateScore(a, dayIndex, shift) - candidateScore(b, dayIndex, shift); })
-                .slice(0, 8);
+                .slice(0, 12);
             });
 
             function choosePerTeam(teamPos, chosen){
@@ -689,7 +697,7 @@
               chosen.forEach(function(idx){ chosenSet[idx] = true; });
               var extraCandidates = remaining.filter(function(idx){ return !chosenSet[idx] && optionsByStaff[idx].indexOf(shift) !== -1; })
                 .sort(function(a,b){ return candidateScore(a, dayIndex, shift) - candidateScore(b, dayIndex, shift); })
-                .slice(0, Math.max(12, extrasNeed + 6));
+                .slice(0, Math.max(16, extrasNeed + 8));
 
               function recurse(startIdx, picks){
                 if(picks.length === extrasNeed){
@@ -751,7 +759,7 @@
       return null;
     }
 
-    function renderAll(){ parseHolidaySet(); updateTeamFields(); updateTotalStaffInput(); buildStaffList(); trimRequestOffByCurrentShape(); renderSummary(); renderScheduleTable(); renderPersonalStats(); renderDailyStats(); }
+    function renderAll(){ parseHolidaySet(); updateTeamFields(); updateTotalStaffInput(); buildStaffList(); trimRequestOffByCurrentShape(); renderSummary(); renderScheduleTable(); renderPersonalStats(); }
     function renderSummary(){ els.statStaff.textContent = String(state.staff.length); els.statRequestedOff.textContent = String(Object.keys(state.requestOff || {}).filter(function(k){ return state.requestOff[k]; }).length); }
 
     function renderScheduleTable(){
